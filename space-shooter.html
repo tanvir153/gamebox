@@ -13,7 +13,7 @@
     canvas { position: absolute; width: 100%; height: 100%; }
     #player {
       position: absolute; width: 50px; height: 50px;
-      background: url('final_assets/ship.png') no-repeat center/contain;
+      background: url('ship.png') no-repeat center/contain;
       image-rendering: pixelated; display: none; z-index: 2;
     }
     .enemy, .boss {
@@ -21,19 +21,19 @@
     }
     .enemy {
       width: 40px; height: 40px;
-      background: url('final_assets/animi ship.png') no-repeat center/contain;
+      background: url('animi ship.png') no-repeat center/contain;
     }
     .boss.boss1 {
       width: 100px; height: 100px;
-      background: url('final_assets/REDBOSS.png') no-repeat center/contain;
+      background: url('REDBOSS.png') no-repeat center/contain;
     }
     .boss.boss2 {
       width: 130px; height: 130px;
-      background: url('final_assets/Geeenboss.png') no-repeat center/contain;
+      background: url('Geeenboss.jpeg') no-repeat center/contain;
     }
     .boss.boss3 {
       width: 160px; height: 160px;
-      background: url('final_assets/finall boss.png') no-repeat center/contain;
+      background: url('finall boss.webp') no-repeat center/contain;
     }
     .bullet {
       position: absolute; width: 5px; height: 15px; z-index: 1;
@@ -49,7 +49,7 @@
     }
     .explosion {
       position: absolute; width: 40px; height: 40px;
-      background: url('final_assets/expo2.jpg') no-repeat center/contain;
+      background: url('expo2.jpg') no-repeat center/contain;
       animation: explode 0.3s ease-out; z-index: 3;
     }
     @keyframes explode {
@@ -72,19 +72,19 @@
   </style>
 </head>
 <body>
-<div id="game">
-  <canvas id="bg"></canvas>
-  <div id="player"></div>
-  <div id="hud">❤️ <span id="lives">3</span> | 💰 Score: <span id="score">0</span> | Level: <span id="level">1</span></div>
-  <div id="startScreen">
-    <img src="final_assets/start.jpg" alt="Start Game"><br>
-    <button onclick="startGame()">▶️ Start Game</button>
+  <div id="game">
+    <canvas id="bg"></canvas>
+    <div id="player"></div>
+    <div id="hud">❤️ <span id="lives">3</span> | 💰 Score: <span id="score">0</span> | Level: <span id="level">1</span></div>
+    <div id="startScreen">
+      <img src="start.jpg" alt="Start Game"><br>
+      <button onclick="startGame()">▶️ Start Game</button>
+    </div>
+    <div id="gameOver" style="display: none;">
+      <h1>💀 GAME OVER</h1>
+      <button onclick="location.reload()">🔁 Retry</button>
+    </div>
   </div>
-  <div id="gameOver" style="display: none;">
-    <h1>💀 GAME OVER</h1>
-    <button onclick="location.reload()">🔁 Retry</button>
-  </div>
-</div>
 <script>
     const game = document.getElementById('game');
     const player = document.getElementById('player');
