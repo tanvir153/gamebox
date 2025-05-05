@@ -2,13 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>👾 Tanvir's Monster Game Hub</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
       height: 100%;
@@ -73,8 +70,8 @@
       background: rgba(255, 255, 255, 0.06);
       border: 2px solid #333;
       border-radius: 16px;
-      padding: 40px;
-      width: 90%;
+      padding: 30px;
+      width: 95%;
       max-width: 900px;
       text-align: center;
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
@@ -82,14 +79,8 @@
     }
 
     @keyframes fadeInUp {
-      0% {
-        transform: translateY(30px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
+      0% { transform: translateY(30px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
 
     .cta-section p {
@@ -102,15 +93,14 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 16px;
     }
 
     .game-btn {
-      position: relative;
       background-color: #111;
       color: #f1c40f;
       border: 2px solid #f1c40f;
-      padding: 18px 28px;
+      padding: 16px 24px;
       border-radius: 12px;
       font-size: 1.1em;
       font-weight: bold;
@@ -118,47 +108,8 @@
       box-shadow: 0 6px 12px rgba(0,0,0,0.5);
       transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
       animation: floaty 2s ease-in-out infinite alternate;
-      overflow: hidden;
-    }
-
-    .game-btn::before, .game-btn::after {
-      content: "✨";
-      position: absolute;
-      font-size: 1.1em;
-      opacity: 0;
-      pointer-events: none;
-      animation: none;
-    }
-
-    .game-btn:hover::before {
-      left: -10px;
-      top: 0;
-      animation: sparkleDown 0.8s ease-out forwards;
-    }
-
-    .game-btn:hover::after {
-      right: -10px;
-      top: 0;
-      animation: sparkleDown 0.8s ease-out 0.2s forwards;
-    }
-
-    @keyframes sparkleDown {
-      0% {
-        opacity: 0;
-        transform: translateY(-10px) rotate(0deg);
-      }
-      30% {
-        opacity: 1;
-        transform: translateY(10px) rotate(45deg);
-      }
-      60% {
-        transform: translateY(25px) rotate(90deg);
-        opacity: 0.8;
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(60px) rotate(180deg);
-      }
+      text-align: center;
+      min-width: 180px;
     }
 
     @keyframes floaty {
@@ -195,6 +146,22 @@
     footer a:hover {
       color: #fff;
     }
+
+    @media (max-width: 600px) {
+      #typed-heading {
+        font-size: 1.8rem;
+      }
+
+      .game-btn {
+        font-size: 1rem;
+        padding: 14px 20px;
+        min-width: 150px;
+      }
+
+      .cta-section {
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -208,8 +175,7 @@
       <p>Click a game to begin your monster-level fun!</p>
       <div class="game-grid">
         <a href="guess.html" class="game-btn">🎯 Guess the Number</a>
-        <a href="space-shooter.html" class="game-btn">Space Shooter</a>
-    
+        <a href="space-shooter.html" class="game-btn">🚀 Space Shooter</a>
       </div>
     </div>
   </main>
