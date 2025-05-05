@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🎯 Guess the Number</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,7 +60,8 @@
     input[type="number"] {
       padding: 10px;
       font-size: 1.1rem;
-      width: 150px;
+      width: 100%;
+      max-width: 300px;
       border: 2px solid #f1c40f;
       border-radius: 8px;
       margin: 15px 0;
@@ -105,6 +107,8 @@
       font-size: 1.1rem;
       margin: 10px 5px;
       transition: transform 0.3s ease, background 0.3s ease;
+      width: 100%;
+      max-width: 300px;
     }
 
     button:hover {
@@ -137,12 +141,19 @@
       0% { background-color: lime; }
       100% { background-color: inherit; }
     }
+
     .secret-number {
-  margin-top: 10px;
-  font-size: 1.2em;
-  color: #f39c12;
-  font-weight: bold;
-}
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #f39c12;
+      font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+      button {
+        margin: 8px 0;
+      }
+    }
 
   </style>
 </head>
@@ -156,9 +167,8 @@
     <br>
     <button onclick="checkGuess()">Check Guess</button>
     <button onclick="resetGame()">🔁 Restart</button>
+    <button onclick="toggleSecret()">👁️ Show Number</button>
     <div class="secret-number" id="secretNumber" style="display: none;"></div>
-<button onclick="toggleSecret()">👁️ Show Number</button>
-
     <div class="feedback" id="message"></div>
     <div class="guess-count" id="count"></div>
   </div>
@@ -212,6 +222,20 @@
       message.textContent = "";
       count.textContent = "";
       message.className = "feedback";
+
+      const reveal = document.getElementById('secretNumber');
+      reveal.textContent = "";
+      reveal.style.display = "none";
+    }
+
+    function toggleSecret() {
+      const reveal = document.getElementById('secretNumber');
+      if (reveal.style.display === "none") {
+        reveal.textContent = `Secret Number: ${secret}`;
+        reveal.style.display = "block";
+      } else {
+        reveal.style.display = "none";
+      }
     }
 
     input.addEventListener("keyup", function (event) {
@@ -219,30 +243,6 @@
         checkGuess();
       }
     });
-
-    function toggleSecret() {
-  const reveal = document.getElementById('secretNumber');
-  if (reveal.style.display === "none") {
-    reveal.textContent = `Secret Number: ${secret}`;
-    reveal.style.display = "block";
-  } else {
-    reveal.style.display = "none";
-  }
-}
-function resetGame() {
-  secret = Math.floor(Math.random() * 100) + 1;
-  attempts = 0;
-  input.value = "";
-  message.textContent = "";
-  count.textContent = "";
-  message.className = "feedback";
-
-  // Hide the revealed number if it's shown
-  const reveal = document.getElementById('secretNumber');
-  reveal.textContent = "";
-  reveal.style.display = "none";
-}
-
   </script>
 
 </body>
