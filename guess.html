@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎯 Guess the Number</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: bgShift 8s ease-in-out infinite;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      color: #f1c40f;
+      margin-bottom: 20px;
+      animation: dropIn 0.8s ease-out;
+      text-shadow: 2px 2px 4px #000;
+    }
+
+    @keyframes dropIn {
+      0% { transform: translateY(-100px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .game-box {
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid #333;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      0% { transform: translateY(30px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    input[type="number"] {
+      padding: 10px;
+      font-size: 1.1rem;
+      width: 150px;
+      border: 2px solid #f1c40f;
+      border-radius: 8px;
+      margin: 15px 0;
+      text-align: center;
+      background-color: #111;
+      color: #fff;
+      outline: none;
+    }
+
+    .feedback {
+      min-height: 1.5em;
+      margin-top: 10px;
+      font-size: 1.1em;
+      transition: color 0.3s ease;
+    }
+
+    .success {
+      color: lime;
+    }
+
+    .warning {
+      color: orange;
+    }
+
+    .danger {
+      color: red;
+    }
+
+    .guess-count {
+      font-size: 0.95em;
+      color: #ccc;
+      margin-top: 8px;
+    }
+
+    button {
+      background-color: #f1c40f;
+      color: #111;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      margin: 10px 5px;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background-color: #ffe600;
+    }
+
+    .back-link {
+      margin-top: 30px;
+      display: inline-block;
+      text-decoration: none;
+      color: #f39c12;
+      font-weight: bold;
+      border: 1px solid #f39c12;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .back-link:hover {
+      background-color: #f39c12;
+      color: #111;
+    }
+
+    .flash-win {
+      animation: flashWin 1s ease-in-out;
+    }
+
+    @keyframes flashWin {
+      0% { background-color: lime; }
+      100% { background-color: inherit; }
+    }
+    .secret-number {
+  margin-top: 10px;
+  font-size: 1.2em;
+  color: #f39c12;
+  font-weight: bold;
+}
+
+  </style>
+</head>
+<body>
+
+  <h1>🎯 Guess the Number</h1>
+
+  <div class="game-box" id="gameBox">
+    <p>I’m thinking of a number between <strong>1 and 100</strong>...</p>
+    <input type="number" id="guessInput" placeholder="Enter your guess" min="1" max="100">
+    <br>
+    <button onclick="checkGuess()">Check Guess</button>
+    <button onclick="resetGame()">🔁 Restart</button>
+    <div class="secret-number" id="secretNumber" style="display: none;"></div>
+<button onclick="toggleSecret()">👁️ Show Number</button>
+
+    <div class="feedback" id="message"></div>
+    <div class="guess-count" id="count"></div>
+  </div>
+
+  <a href="index.html" class="back-link">⬅️ Back to Game Hub</a>
+
+  <script>
+    let secret = Math.floor(Math.random() * 100) + 1;
+    let attempts = 0;
+
+    const input = document.getElementById('guessInput');
+    const message = document.getElementById('message');
+    const count = document.getElementById('count');
+    const box = document.getElementById('gameBox');
+
+    function checkGuess() {
+      const guess = parseInt(input.value);
+      if (!guess || guess < 1 || guess > 100) {
+        message.textContent = "🚫 Enter a number between 1 and 100.";
+        message.className = "feedback warning";
+        return;
+      }
+
+      attempts++;
+      count.textContent = `Attempts: ${attempts}`;
+
+      if (guess === secret) {
+        message.textContent = "🎉 Correct! You guessed it!";
+        message.className = "feedback success";
+        box.classList.add('flash-win');
+        setTimeout(() => box.classList.remove('flash-win'), 1000);
+      } else {
+        let diff = Math.abs(guess - secret);
+        if (diff <= 3) {
+          message.textContent = guess < secret ? "🔥 Very close, but too low!" : "🔥 Very close, but too high!";
+        } else if (diff <= 10) {
+          message.textContent = guess < secret ? "🔅 Close! Try higher." : "🔅 Close! Try lower.";
+        } else {
+          message.textContent = guess < secret ? "📉 Too low!" : "📈 Too high!";
+        }
+        message.className = "feedback danger";
+      }
+
+      input.value = "";
+    }
+
+    function resetGame() {
+      secret = Math.floor(Math.random() * 100) + 1;
+      attempts = 0;
+      input.value = "";
+      message.textContent = "";
+      count.textContent = "";
+      message.className = "feedback";
+    }
+
+    input.addEventListener("keyup", function (event) {
+      if (event.key === "Enter") {
+        checkGuess();
+      }
+    });
+
+    function toggleSecret() {
+  const reveal = document.getElementById('secretNumber');
+  if (reveal.style.display === "none") {
+    reveal.textContent = `Secret Number: ${secret}`;
+    reveal.style.display = "block";
+  } else {
+    reveal.style.display = "none";
+  }
+}
+function resetGame() {
+  secret = Math.floor(Math.random() * 100) + 1;
+  attempts = 0;
+  input.value = "";
+  message.textContent = "";
+  count.textContent = "";
+  message.className = "feedback";
+
+  // Hide the revealed number if it's shown
+  const reveal = document.getElementById('secretNumber');
+  reveal.textContent = "";
+  reveal.style.display = "none";
+}
+
+  </script>
+
+</body>
+</html>
