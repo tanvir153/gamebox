@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Monster Space Shooter V4 - Boss Edition</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -9,7 +10,7 @@
       width: 100%; height: 100%; overflow: hidden;
       background: black; font-family: 'Segoe UI', sans-serif;
     }
-    #game { position: relative; width: 100vw; height: 100vh; }
+    #game { position: relative; width: 100vw; height: 100vh; touch-action: none; }
     canvas { position: absolute; width: 100%; height: 100%; }
     #player {
       position: absolute; width: 50px; height: 50px;
@@ -35,17 +36,17 @@
       width: 160px; height: 160px;
       background: url('finall boss.webp') no-repeat center/contain;
     }
+    .bullet, .enemy-bullet, .laser {
+      position: absolute; z-index: 1;
+    }
     .bullet {
-      position: absolute; width: 5px; height: 15px; z-index: 1;
-      background: blue;
+      width: 5px; height: 15px; background: blue;
     }
     .enemy-bullet {
-      position: absolute; width: 5px; height: 15px; z-index: 1;
-      background: red;
+      width: 5px; height: 15px; background: red;
     }
     .laser {
-      position: absolute; width: 10px; height: 100px; z-index: 1;
-      background: purple;
+      width: 10px; height: 100px; background: purple;
     }
     .explosion {
       position: absolute; width: 40px; height: 40px;
@@ -69,6 +70,12 @@
       background: #f1c40f; color: #111; border: none;
       border-radius: 8px; cursor: pointer;
     }
+    @media (max-width: 600px) {
+      button {
+        font-size: 1.2rem;
+        padding: 12px 24px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -77,7 +84,7 @@
     <div id="player"></div>
     <div id="hud">❤️ <span id="lives">3</span> | 💰 Score: <span id="score">0</span> | Level: <span id="level">1</span></div>
     <div id="startScreen">
-      <img src="start.jpg" alt="Start Game"><br>
+      <img src="start.jpg" alt="Start Game" style="max-width: 90vw;"><br>
       <button onclick="startGame()">▶️ Start Game</button>
     </div>
     <div id="gameOver" style="display: none;">
@@ -85,7 +92,8 @@
       <button onclick="location.reload()">🔁 Retry</button>
     </div>
   </div>
-<script>
+
+  <script>
     const game = document.getElementById('game');
     const player = document.getElementById('player');
     const hud = document.getElementById('hud');
@@ -98,12 +106,18 @@
     const ctx = bg.getContext('2d');
     bg.width = window.innerWidth;
     bg.height = window.innerHeight;
-    
+
     let score = 0, lives = 3, level = 1;
     let gameRunning = false;
     let shootInterval, enemyInterval;
-    let stars = Array.from({length: 100}, () => ({x: Math.random() * bg.width, y: Math.random() * bg.height, size: Math.random() * 2, speed: Math.random() * 1.5 + 0.5}));
-    
+
+    const stars = Array.from({length: 100}, () => ({
+      x: Math.random() * bg.width,
+      y: Math.random() * bg.height,
+      size: Math.random() * 2,
+      speed: Math.random() * 1.5 + 0.5
+    }));
+
     function drawStars() {
       ctx.clearRect(0, 0, bg.width, bg.height);
       ctx.fillStyle = 'white';
@@ -117,7 +131,7 @@
       requestAnimationFrame(drawStars);
     }
     drawStars();
-    
+
     function shoot() {
       if (!gameRunning) return;
       const bullet = document.createElement('div');
@@ -127,9 +141,7 @@
       game.appendChild(bullet);
       const interval = setInterval(() => {
         bullet.style.top = bullet.offsetTop - 10 + 'px';
-        if (bullet.offsetTop < 0) {
-          bullet.remove(); clearInterval(interval);
-        }
+        if (bullet.offsetTop < 0) { bullet.remove(); clearInterval(interval); }
         document.querySelectorAll('.enemy, .boss').forEach(target => {
           const rect1 = bullet.getBoundingClientRect();
           const rect2 = target.getBoundingClientRect();
@@ -147,13 +159,13 @@
         });
       }, 20);
     }
-    
+
     function checkBossSpawn() {
       if ((score === 30 || score === 60 || score === 100) && !document.querySelector('.boss')) {
         spawnBoss();
       }
     }
-    
+
     function spawnEnemy() {
       if (!gameRunning || document.querySelector('.boss')) return;
       const enemy = document.createElement('div');
@@ -181,7 +193,7 @@
         if (Math.random() < 0.01) enemyFire(enemy);
       }, 40);
     }
-    
+
     function spawnBoss() {
       const boss = document.createElement('div');
       boss.classList.add('boss', `boss${level}`);
@@ -199,7 +211,7 @@
       level++;
       levelEl.textContent = level;
     }
-    
+
     function enemyFire(enemy) {
       const bullet = document.createElement('div');
       bullet.classList.add('enemy-bullet');
@@ -208,24 +220,11 @@
       game.appendChild(bullet);
       const fall = setInterval(() => {
         bullet.style.top = bullet.offsetTop + 5 + 'px';
-        if (bullet.offsetTop > game.offsetHeight) {
-          bullet.remove(); clearInterval(fall);
-        }
-        const playerRect = player.getBoundingClientRect();
-        const bulletRect = bullet.getBoundingClientRect();
-        if (
-          bulletRect.top < playerRect.bottom &&
-          bulletRect.bottom > playerRect.top &&
-          bulletRect.left < playerRect.right &&
-          bulletRect.right > playerRect.left
-        ) {
-          createExplosion(player.offsetLeft, player.offsetTop);
-          bullet.remove(); clearInterval(fall);
-          loseLife();
-        }
+        if (bullet.offsetTop > game.offsetHeight) { bullet.remove(); clearInterval(fall); }
+        checkHit(bullet, fall);
       }, 30);
     }
-    
+
     function bossFire(boss) {
       const attack = document.createElement('div');
       attack.classList.add('laser');
@@ -234,24 +233,26 @@
       game.appendChild(attack);
       const drop = setInterval(() => {
         attack.style.top = attack.offsetTop + 10 + 'px';
-        if (attack.offsetTop > game.offsetHeight) {
-          attack.remove(); clearInterval(drop);
-        }
-        const playerRect = player.getBoundingClientRect();
-        const atkRect = attack.getBoundingClientRect();
-        if (
-          atkRect.top < playerRect.bottom &&
-          atkRect.bottom > playerRect.top &&
-          atkRect.left < playerRect.right &&
-          atkRect.right > playerRect.left
-        ) {
-          createExplosion(player.offsetLeft, player.offsetTop);
-          attack.remove(); clearInterval(drop);
-          loseLife();
-        }
+        if (attack.offsetTop > game.offsetHeight) { attack.remove(); clearInterval(drop); }
+        checkHit(attack, drop);
       }, 20);
     }
-    
+
+    function checkHit(projectile, intervalId) {
+      const playerRect = player.getBoundingClientRect();
+      const projRect = projectile.getBoundingClientRect();
+      if (
+        projRect.top < playerRect.bottom &&
+        projRect.bottom > playerRect.top &&
+        projRect.left < playerRect.right &&
+        projRect.right > playerRect.left
+      ) {
+        createExplosion(player.offsetLeft, player.offsetTop);
+        projectile.remove(); clearInterval(intervalId);
+        loseLife();
+      }
+    }
+
     function createExplosion(x, y) {
       const boom = document.createElement('div');
       boom.classList.add('explosion');
@@ -260,11 +261,11 @@
       game.appendChild(boom);
       setTimeout(() => boom.remove(), 300);
     }
-    
+
     function updateLivesDisplay() {
       livesEl.innerHTML = '❤️ '.repeat(lives);
     }
-    
+
     function loseLife() {
       if (!gameRunning) return;
       lives--;
@@ -272,7 +273,7 @@
       updateLivesDisplay();
       if (lives <= 0) endGame();
     }
-    
+
     function startGame() {
       startScreen.style.display = 'none';
       hud.style.display = 'block';
@@ -284,7 +285,7 @@
       enemyInterval = setInterval(spawnEnemy, 1000);
       shootInterval = setInterval(shoot, 300);
     }
-    
+
     function endGame() {
       if (!gameRunning) return;
       gameRunning = false;
@@ -294,51 +295,40 @@
       clearInterval(shootInterval);
       document.querySelectorAll('.enemy, .bullet, .enemy-bullet, .laser, .boss').forEach(e => e.remove());
     }
-    
+
+    // Mouse movement
     game.addEventListener('mousemove', e => {
       if (!gameRunning) return;
       const rect = game.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-      let newLeft = mouseX - player.offsetWidth / 2;
-      let newTop = mouseY - player.offsetHeight / 2;
+      movePlayer(mouseX, mouseY);
+    });
+
+    // Touch movement
+    game.addEventListener('touchmove', e => {
+      if (!gameRunning || e.touches.length === 0) return;
+      const rect = game.getBoundingClientRect();
+      const touchX = e.touches[0].clientX - rect.left;
+      const touchY = e.touches[0].clientY - rect.top;
+      movePlayer(touchX, touchY);
+    }, { passive: true });
+
+    function movePlayer(x, y) {
+      let newLeft = x - player.offsetWidth / 2;
+      let newTop = y - player.offsetHeight / 2;
       newLeft = Math.max(0, Math.min(newLeft, game.offsetWidth - player.offsetWidth));
       newTop = Math.max(0, Math.min(newTop, game.offsetHeight - player.offsetHeight));
       player.style.left = newLeft + 'px';
       player.style.top = newTop + 'px';
-    });
-    // Add push button element
-// Add push button element
-const pushBtn = document.createElement('button');
-pushBtn.textContent = '📣 PUSH';
-pushBtn.style.position = 'absolute';
-pushBtn.style.top = '10px';
-pushBtn.style.right = '10px';
-pushBtn.style.padding = '8px 16px';
-pushBtn.style.fontSize = '1rem';
-pushBtn.style.backgroundColor = '#f39c12';
-pushBtn.style.color = 'black';
-pushBtn.style.border = 'none';
-pushBtn.style.borderRadius = '8px';
-pushBtn.style.zIndex = '1000';
-pushBtn.style.cursor = 'pointer';
-pushBtn.addEventListener('click', () => {
-  const popup = document.createElement('div');
-  popup.textContent = '🚀 Game Pushed! Tap to Start';
-  popup.style.position = 'fixed';
-  popup.style.top = '50%';
-  popup.style.left = '50%';
-  popup.style.transform = 'translate(-50%, -50%)';
-  popup.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-  popup.style.color = 'white';
-  popup.style.padding = '20px 40px';
-  popup.style.fontSize = '1.5rem';
-  popup.style.borderRadius = '12px';
-  popup.style.zIndex = '9999';
-  document.body.appendChild(popup);
-  setTimeout(() => popup.remove(), 2000);
-});
-document.body.appendChild(pushBtn);
-    </script>
+    }
+
+    // Touchstart fires shooting if not yet firing
+    game.addEventListener('touchstart', function () {
+      if (gameRunning && !shootInterval) {
+        shootInterval = setInterval(shoot, 300);
+      }
+    }, { passive: true });
+  </script>
 </body>
 </html>
