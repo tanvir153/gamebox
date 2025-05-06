@@ -2,79 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monster Space Shooter V4 - Boss Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monster Space Shooter V4 – Boss Edition</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin:0; padding:0; box-sizing:border-box }
     html, body {
-      width: 100%; height: 100%; overflow: hidden;
-      background: black; font-family: 'Segoe UI', sans-serif;
+      width:100%; height:100%; overflow:hidden;
+      background:black; font-family:'Segoe UI',sans-serif;
+      touch-action:none;
     }
-    #game { position: relative; width: 100vw; height: 100vh; touch-action: none; }
-    canvas { position: absolute; width: 100%; height: 100%; }
+    #game { position:relative; width:100vw; height:100vh }
+    canvas { position:absolute; width:100%; height:100% }
     #player {
-      position: absolute; width: 50px; height: 50px;
-      background: url('ship.png') no-repeat center/contain;
-      image-rendering: pixelated; display: none; z-index: 2;
+      position:absolute; width:50px; height:50px;
+      background:url('myship.png') no-repeat center/contain;
+      image-rendering:pixelated; display:none; z-index:2;
     }
     .enemy, .boss {
-      position: absolute; top: 0; z-index: 1; image-rendering: pixelated;
+      position:absolute; top:0; image-rendering:pixelated; z-index:1;
     }
     .enemy {
-      width: 40px; height: 40px;
-      background: url('animi ship.png') no-repeat center/contain;
+      width:45px; height:45px;
+      background:url('animi_ship.png') no-repeat center/contain;
     }
-    .boss.boss1 {
-      width: 100px; height: 100px;
-      background: url('REDBOSS.png') no-repeat center/contain;
+    .boss.boss1 { width:100px; height:100px; background:url('Boss1.png') no-repeat center/contain; }
+    .boss.boss2 { width:130px; height:130px; background:url('Boss2.jpeg') no-repeat center/contain; }
+    .boss.boss3 { width:160px; height:160px; background:url('Boss3.webp') no-repeat center/contain; }
+    .boss.boss4 { width:190px; height:190px; background:url('Boss4.webp') no-repeat center/contain; }
+    .bullet, .enemy-bullet, .boss-bullet, .laser, .life-box {
+      position:absolute; z-index:1;
     }
-    .boss.boss2 {
-      width: 130px; height: 130px;
-      background: url('Geeenboss.jpeg') no-repeat center/contain;
-    }
-    .boss.boss3 {
-      width: 160px; height: 160px;
-      background: url('finall boss.webp') no-repeat center/contain;
-    }
-    .bullet, .enemy-bullet, .laser {
-      position: absolute; z-index: 1;
-    }
-    .bullet {
-      width: 5px; height: 15px; background: blue;
-    }
-    .enemy-bullet {
-      width: 5px; height: 15px; background: red;
-    }
-    .laser {
-      width: 10px; height: 100px; background: purple;
+    .bullet       { width:5px;  height:15px; background:blue;   }
+    .enemy-bullet { width:5px;  height:15px; background:red;    }
+    .boss-bullet  { width:5px;  height:15px; background:orange; }
+    .laser        { width:10px; height:100px; background:purple;}
+    .life-box {
+      width:35px; height:35px;
+      background:url('life.png') no-repeat center/contain;
     }
     .explosion {
-      position: absolute; width: 40px; height: 40px;
-      background: url('expo2.jpg') no-repeat center/contain;
-      animation: explode 0.3s ease-out; z-index: 3;
+      position:absolute; width:40px; height:40px;
+      background:url('expo2.jpg') no-repeat center/contain;
+      animation:explode .3s ease-out; z-index:3;
     }
     @keyframes explode {
-      from { transform: scale(1); opacity: 1; }
-      to { transform: scale(1.5); opacity: 0; }
+      from {transform:scale(1);opacity:1}
+      to   {transform:scale(1.5);opacity:0}
     }
     #hud {
-      position: absolute; top: 10px; left: 10px; color: white;
-      font-size: 1.2rem; display: none; z-index: 4;
+      position:absolute; top:10px; left:10px; color:white;
+      font-size:1.2rem; display:none; z-index:4;
     }
-    #startScreen, #gameOver {
-      position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-      z-index: 5; text-align: center;
+    #startScreen,#gameOver {
+      position:absolute; top:40%; left:50%;
+      transform:translate(-50%,-50%); text-align:center; color:white; z-index:5;
     }
     button {
-      margin-top: 20px; padding: 10px 20px; font-size: 1rem;
-      background: #f1c40f; color: #111; border: none;
-      border-radius: 8px; cursor: pointer;
+      margin-top:20px; padding:20px 30px; font-size:1rem;
+      background:#f1c40f; color:#111; border:none; border-radius:8px; cursor:pointer;
     }
-    @media (max-width: 600px) {
-      button {
-        font-size: 1.2rem;
-        padding: 12px 24px;
-      }
+    @media(max-width:600px){
+      button{font-size:1.2rem;padding:12px 24px}
     }
   </style>
 </head>
@@ -82,253 +70,379 @@
   <div id="game">
     <canvas id="bg"></canvas>
     <div id="player"></div>
-    <div id="hud">❤️ <span id="lives">3</span> | 💰 Score: <span id="score">0</span> | Level: <span id="level">1</span></div>
+    <div id="hud">
+      ❤️ <span id="lives">3</span> | 💰 Score: <span id="score">0</span> |
+      Level: <span id="level">1</span>
+    </div>
     <div id="startScreen">
-      <img src="start.jpg" alt="Start Game" style="max-width: 90vw;"><br>
       <button onclick="startGame()">▶️ Start Game</button>
     </div>
-    <div id="gameOver" style="display: none;">
+    <div id="gameOver" style="display:none;">
       <h1>💀 GAME OVER</h1>
       <button onclick="location.reload()">🔁 Retry</button>
     </div>
   </div>
 
   <script>
-    const game = document.getElementById('game');
-    const player = document.getElementById('player');
-    const hud = document.getElementById('hud');
-    const livesEl = document.getElementById('lives');
-    const scoreEl = document.getElementById('score');
-    const levelEl = document.getElementById('level');
-    const startScreen = document.getElementById('startScreen');
-    const gameOverScreen = document.getElementById('gameOver');
-    const bg = document.getElementById('bg');
-    const ctx = bg.getContext('2d');
+    // DOM & Canvas
+    const game = document.getElementById('game'),
+          playerEl = document.getElementById('player'),
+          hud = document.getElementById('hud'),
+          livesEl = document.getElementById('lives'),
+          scoreEl = document.getElementById('score'),
+          levelEl = document.getElementById('level'),
+          startScreen = document.getElementById('startScreen'),
+          gameOverScreen = document.getElementById('gameOver'),
+          bg = document.getElementById('bg'),
+          ctx = bg.getContext('2d');
     bg.width = window.innerWidth;
     bg.height = window.innerHeight;
 
-    let score = 0, lives = 3, level = 1;
-    let gameRunning = false;
-    let shootInterval, enemyInterval;
+    // State
+    let score = 0,
+        lives = 3,
+        bossesDefeated = 0;
 
-    const stars = Array.from({length: 100}, () => ({
-      x: Math.random() * bg.width,
-      y: Math.random() * bg.height,
-      size: Math.random() * 2,
-      speed: Math.random() * 1.5 + 0.5
-    }));
+    let gameRunning = false,
+        lastTime = 0,
+        enemyTimer = 0,
+        shootCooldown = 0,
+        bossAttackTimer = 0,
+        lifeTimer = 0;
 
-    function drawStars() {
+    const bossThresholds = [30, 60, 110, 160],
+          bossHP         = [80, 160, 220, 300];
+    let nextBossIndex = 0;
+
+    // pending boss-shot timeouts
+    let bossTimeouts = [];
+
+    // Input
+    let mx = bg.width/2,
+        my = bg.height*0.8,
+        firing = false;
+
+    // Entities
+    const stars       = [],
+          bullets     = [],
+          enemies     = [],
+          bossBullets = [],
+          lasers      = [],
+          lifeBoxes   = [];
+    let boss = null;
+
+    // Starfield
+    for (let i = 0; i < 30; i++) {
+      stars.push({
+        x: Math.random() * bg.width,
+        y: Math.random() * bg.height,
+        size: Math.random() * 2,
+        speed: Math.random() * 1.5 + 0.5
+      });
+    }
+
+    function gameLoop(ts) {
+      let dt = ts - lastTime;
+      lastTime = ts;
+      if (!gameRunning) return;
+      if (dt > 30) dt = 30;
+
+      // if score hits 70, force‐kill boss immediately
+      if (score >= 70 && boss) {
+        // clear all boss activity
+        boss.el.remove();
+        boss = null;
+        bossTimeouts.forEach(t => clearTimeout(t));
+        bossTimeouts = [];
+        bossBullets.forEach(p=>p.el.remove());
+        bossBullets.length = 0;
+        lasers.forEach(p=>p.el.remove());
+        lasers.length = 0;
+        bossesDefeated++;
+        updateHUD();
+      }
+
+      enemyTimer += dt;
+      shootCooldown -= dt;
+      bossAttackTimer += dt;
+      lifeTimer += dt;
+
+      // Spawn enemies
+      if (enemyTimer > 1000) {
+        spawnEnemy();
+        enemyTimer -= 1000;
+      }
+
+      // Spawn boss at thresholds
+      if (nextBossIndex < bossThresholds.length &&
+          score >= bossThresholds[nextBossIndex] &&
+          !boss) {
+        spawnBoss();
+        nextBossIndex++;
+      }
+
+      // Auto-shoot
+      if (firing && shootCooldown <= 0) {
+        shoot();
+        shootCooldown = 300;
+      }
+
+      // Draw starfield
       ctx.clearRect(0, 0, bg.width, bg.height);
       ctx.fillStyle = 'white';
-      stars.forEach(star => {
-        star.y += star.speed;
-        if (star.y > bg.height) star.y = 0;
+      stars.forEach(s => {
+        s.y += s.speed * dt / 16;
+        if (s.y > bg.height) s.y = 0;
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
         ctx.fill();
       });
-      requestAnimationFrame(drawStars);
-    }
-    drawStars();
 
-    function shoot() {
-      if (!gameRunning) return;
-      const bullet = document.createElement('div');
-      bullet.classList.add('bullet');
-      bullet.style.left = player.offsetLeft + player.offsetWidth / 2 - 2.5 + 'px';
-      bullet.style.top = player.offsetTop + 'px';
-      game.appendChild(bullet);
-      const interval = setInterval(() => {
-        bullet.style.top = bullet.offsetTop - 10 + 'px';
-        if (bullet.offsetTop < 0) { bullet.remove(); clearInterval(interval); }
-        document.querySelectorAll('.enemy, .boss').forEach(target => {
-          const rect1 = bullet.getBoundingClientRect();
-          const rect2 = target.getBoundingClientRect();
-          if (
-            rect1.left < rect2.right && rect1.right > rect2.left &&
-            rect1.top < rect2.bottom && rect1.bottom > rect2.top
-          ) {
-            createExplosion(target.offsetLeft, target.offsetTop);
-            target.dataset.hp = (parseInt(target.dataset.hp) - 1).toString();
-            if (parseInt(target.dataset.hp) <= 0) target.remove();
-            bullet.remove(); clearInterval(interval);
-            score++; scoreEl.textContent = score;
-            checkBossSpawn();
+      // Update
+      updateBullets(dt);
+      updateEnemies(dt);
+      if (boss) updateBoss(dt);
+      updateProjectiles(bossBullets, dt);
+      updateProjectiles(lasers, dt);
+      updatePickups(lifeBoxes, dt);
+
+      // Draw player
+      playerEl.style.left = (mx - 25) + 'px';
+      playerEl.style.top  = (my - 25) + 'px';
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Shooting
+    function shoot(){
+      const el = document.createElement('div');
+      el.classList.add('bullet');
+      game.appendChild(el);
+      const b = { el, x: mx - 2.5, y: my - 25 };
+      el.style.left = b.x + 'px';
+      el.style.top  = b.y + 'px';
+      bullets.push(b);
+    }
+
+    function updateBullets(dt){
+      for(let i=bullets.length-1;i>=0;i--){
+        const b=bullets[i];
+        b.y -= 10 * dt/16;
+        if(b.y<0){ b.el.remove(); bullets.splice(i,1); continue; }
+        b.el.style.top=b.y+'px';
+
+        // hit enemies
+        for(let j=enemies.length-1;j>=0;j--){
+          if(collide(b.el,enemies[j].el)){
+            enemies[j].el.remove();
+            createExplosion(enemies[j].x,enemies[j].y);
+            enemies.splice(j,1);
+            score++; updateHUD();
+            b.el.remove(); bullets.splice(i,1);
+            break;
           }
-        });
-      }, 20);
-    }
-
-    function checkBossSpawn() {
-      if ((score === 30 || score === 60 || score === 100) && !document.querySelector('.boss')) {
-        spawnBoss();
-      }
-    }
-
-    function spawnEnemy() {
-      if (!gameRunning || document.querySelector('.boss')) return;
-      const enemy = document.createElement('div');
-      enemy.classList.add('enemy');
-      enemy.dataset.hp = '1';
-      enemy.style.left = Math.random() * (game.offsetWidth - 40) + 'px';
-      enemy.style.top = '0px';
-      game.appendChild(enemy);
-      const move = setInterval(() => {
-        if (!gameRunning) return clearInterval(move);
-        enemy.style.top = enemy.offsetTop + 3 + 'px';
-        if (enemy.offsetTop > game.offsetHeight) { enemy.remove(); clearInterval(move); }
-        const enemyRect = enemy.getBoundingClientRect();
-        const playerRect = player.getBoundingClientRect();
-        if (
-          enemyRect.top < playerRect.bottom &&
-          enemyRect.bottom > playerRect.top &&
-          enemyRect.left < playerRect.right &&
-          enemyRect.right > playerRect.left
-        ) {
-          createExplosion(enemy.offsetLeft, enemy.offsetTop);
-          enemy.remove(); clearInterval(move);
-          loseLife();
         }
-        if (Math.random() < 0.01) enemyFire(enemy);
-      }, 40);
-    }
 
-    function spawnBoss() {
-      const boss = document.createElement('div');
-      boss.classList.add('boss', `boss${level}`);
-      boss.dataset.hp = (10 + level * 10).toString();
-      boss.style.left = game.offsetWidth / 2 - (50 + level * 10) + 'px';
-      boss.style.top = '100px';
-      game.appendChild(boss);
-      let dir = 1;
-      const move = setInterval(() => {
-        if (!gameRunning || !document.body.contains(boss)) return clearInterval(move);
-        boss.style.left = boss.offsetLeft + dir * 5 + 'px';
-        if (boss.offsetLeft < 0 || boss.offsetLeft > game.offsetWidth - boss.offsetWidth) dir *= -1;
-        if (Math.random() < 0.1) bossFire(boss);
-      }, 100);
-      level++;
-      levelEl.textContent = level;
-    }
-
-    function enemyFire(enemy) {
-      const bullet = document.createElement('div');
-      bullet.classList.add('enemy-bullet');
-      bullet.style.left = enemy.offsetLeft + 18 + 'px';
-      bullet.style.top = enemy.offsetTop + 40 + 'px';
-      game.appendChild(bullet);
-      const fall = setInterval(() => {
-        bullet.style.top = bullet.offsetTop + 5 + 'px';
-        if (bullet.offsetTop > game.offsetHeight) { bullet.remove(); clearInterval(fall); }
-        checkHit(bullet, fall);
-      }, 30);
-    }
-
-    function bossFire(boss) {
-      const attack = document.createElement('div');
-      attack.classList.add('laser');
-      attack.style.left = boss.offsetLeft + boss.offsetWidth / 2 - 5 + 'px';
-      attack.style.top = boss.offsetTop + boss.offsetHeight + 'px';
-      game.appendChild(attack);
-      const drop = setInterval(() => {
-        attack.style.top = attack.offsetTop + 10 + 'px';
-        if (attack.offsetTop > game.offsetHeight) { attack.remove(); clearInterval(drop); }
-        checkHit(attack, drop);
-      }, 20);
-    }
-
-    function checkHit(projectile, intervalId) {
-      const playerRect = player.getBoundingClientRect();
-      const projRect = projectile.getBoundingClientRect();
-      if (
-        projRect.top < playerRect.bottom &&
-        projRect.bottom > playerRect.top &&
-        projRect.left < playerRect.right &&
-        projRect.right > playerRect.left
-      ) {
-        createExplosion(player.offsetLeft, player.offsetTop);
-        projectile.remove(); clearInterval(intervalId);
-        loseLife();
+        // hit boss
+        if(boss && collide(b.el,boss.el)){
+          boss.hp--;
+          b.el.remove(); bullets.splice(i,1);
+          if(boss.hp<=0){
+            boss.el.remove();
+            createExplosion(boss.x,boss.y);
+            boss = null;
+            bossTimeouts.forEach(t=>clearTimeout(t));
+            bossTimeouts=[];
+            bossBullets.forEach(p=>p.el.remove());
+            bossBullets.length=0;
+            lasers.forEach(p=>p.el.remove());
+            lasers.length=0;
+            bossesDefeated++; score++; updateHUD();
+            if(bossesDefeated>=bossThresholds.length) setTimeout(winGame,500);
+          }
+        }
       }
     }
 
-    function createExplosion(x, y) {
-      const boom = document.createElement('div');
-      boom.classList.add('explosion');
-      boom.style.left = x + 'px';
-      boom.style.top = y + 'px';
-      game.appendChild(boom);
-      setTimeout(() => boom.remove(), 300);
+    // Enemies
+    function spawnEnemy(){
+      const el=document.createElement('div');
+      el.classList.add('enemy');
+      game.appendChild(el);
+      const x=Math.random()*(bg.width-45);
+      el.style.left=x+'px';
+      el.style.top='0px';
+      enemies.push({el,x,y:0,fireTimer:0});
+    }
+    function updateEnemies(dt){
+      for(let i=enemies.length-1;i>=0;i--){
+        const e=enemies[i];
+        e.y+=3*dt/16; e.el.style.top=e.y+'px';
+        if(collide(e.el,playerEl)){
+          e.el.remove(); createExplosion(e.x,e.y);
+          enemies.splice(i,1); loseLife(); continue;
+        }
+        e.fireTimer+=dt;
+        if(e.fireTimer>1000){ enemyFire(e); e.fireTimer=0; }
+        if(e.y>bg.height){ e.el.remove(); enemies.splice(i,1); }
+      }
+    }
+    function enemyFire(e){
+      const el=document.createElement('div');
+      el.classList.add('enemy-bullet');
+      game.appendChild(el);
+      const b={el,x:e.x+18,y:e.y+40,speed:5};
+      el.style.left=b.x+'px';
+      el.style.top =b.y+'px';
+      bossBullets.push(b);
     }
 
-    function updateLivesDisplay() {
-      livesEl.innerHTML = '❤️ '.repeat(lives);
+    // Boss
+    function spawnBoss(){
+      const idx=nextBossIndex;
+      const el=document.createElement('div');
+      el.classList.add('boss','boss'+(idx+1));
+      game.appendChild(el);
+      const x=bg.width/2-(50+(idx+1)*10);
+      el.style.left=x+'px';
+      el.style.top ='100px';
+      boss={el,x,y:100,hp:bossHP[idx],dir:1,moving:true,attackTimer:0};
+    }
+    function updateBoss(dt){
+      boss.attackTimer+=dt;
+      if(boss.moving){
+        boss.x+=boss.dir*2*dt/16;
+        if(boss.x<0||boss.x>bg.width-boss.el.offsetWidth) boss.dir*=-1;
+        boss.el.style.left=boss.x+'px';
+      }
+      if(boss.attackTimer>3000){
+        boss.attackTimer=0;
+        boss.moving=false;
+        if(Math.random()<0.5){
+          for(let i=-1;i<=1;i++) bossFire('boss-bullet',6,i*150+100);
+        } else spawnLaser();
+        setTimeout(()=>boss.moving=true,2000);
+      }
+    }
+    function bossFire(cls,speed,delay){
+      const t=setTimeout(()=>{
+        if(!boss) return;
+        const el=document.createElement('div');
+        el.classList.add(cls);
+        game.appendChild(el);
+        const b={el,x:boss.x+boss.el.offsetWidth/2-(cls==='boss-bullet'?4:5),
+                 y:boss.y+boss.el.offsetHeight,speed};
+        el.style.left=b.x+'px'; el.style.top=b.y+'px';
+        bossBullets.push(b);
+      },delay);
+      bossTimeouts.push(t);
+    }
+    function spawnLaser(){
+      if(!boss) return;
+      const el=document.createElement('div');
+      el.classList.add('laser');
+      game.appendChild(el);
+      const l={el,x:boss.x+boss.el.offsetWidth/2-5,y:boss.y+boss.el.offsetHeight,speed:12};
+      el.style.left=l.x+'px'; el.style.top=l.y+'px';
+      lasers.push(l);
     }
 
-    function loseLife() {
-      if (!gameRunning) return;
-      lives--;
-      if (lives < 0) lives = 0;
-      updateLivesDisplay();
-      if (lives <= 0) endGame();
+    // Projectiles
+    function updateProjectiles(arr,dt){
+      for(let i=arr.length-1;i>=0;i--){
+        const p=arr[i];
+        p.y+=p.speed*dt/16;
+        p.el.style.top=p.y+'px';
+        if(p.y>bg.height){ p.el.remove(); arr.splice(i,1); continue;}
+        if(collide(p.el,playerEl)){ p.el.remove(); arr.splice(i,1); loseLife();}
+      }
     }
 
-    function startGame() {
-      startScreen.style.display = 'none';
-      hud.style.display = 'block';
-      player.style.display = 'block';
-      player.style.left = (game.offsetWidth / 2 - 25) + 'px';
-      player.style.top = (game.offsetHeight - 80) + 'px';
-      gameRunning = true; score = 0; lives = 3; level = 1;
-      updateLivesDisplay(); scoreEl.textContent = score; levelEl.textContent = level;
-      enemyInterval = setInterval(spawnEnemy, 1000);
-      shootInterval = setInterval(shoot, 300);
+    // Life‐box
+    function spawnLifeBox(){
+      const el=document.createElement('div');
+      el.classList.add('life-box');
+      game.appendChild(el);
+      const l={el,x:Math.random()*(bg.width-35),y:0};
+      el.style.left=l.x+'px'; el.style.top='0px';
+      lifeBoxes.push(l);
+    }
+    function updatePickups(arr,dt){
+      for(let i=arr.length-1;i>=0;i--){
+        const p=arr[i];
+        p.y+=2*dt/16; p.el.style.top=p.y+'px';
+        if(p.y>bg.height){ p.el.remove(); arr.splice(i,1); continue;}
+        if(collide(p.el,playerEl)){
+          lives=Math.min(5,lives+1);
+          updateHUD();
+          p.el.remove(); arr.splice(i,1);
+        }
+      }
     }
 
-    function endGame() {
-      if (!gameRunning) return;
-      gameRunning = false;
-      player.style.display = 'none';
-      gameOverScreen.style.display = 'block';
-      clearInterval(enemyInterval);
-      clearInterval(shootInterval);
-      document.querySelectorAll('.enemy, .bullet, .enemy-bullet, .laser, .boss').forEach(e => e.remove());
+    // Utils
+    function createExplosion(x,y){
+      const ex=document.createElement('div');
+      ex.classList.add('explosion');
+      game.appendChild(ex);
+      ex.style.left=x+'px'; ex.style.top=y+'px';
+      setTimeout(()=>ex.remove(),300);
+    }
+    function collide(a,b){
+      const r1=a.getBoundingClientRect(),r2=b.getBoundingClientRect();
+      return r1.left<r2.right&&r1.right>r2.left&&r1.top<r2.bottom&&r1.bottom>r2.top;
+    }
+    function updateHUD(){
+      livesEl.innerHTML='❤️ '.repeat(lives);
+      scoreEl.textContent=score;
+      levelEl.textContent=bossesDefeated+1;
+    }
+    function loseLife(){
+      if(!gameRunning)return;
+      lives=Math.max(0,lives-1);
+      updateHUD();
+      if(lives===0) endGame();
+    }
+    function winGame(){
+      gameRunning=false;
+      document.querySelectorAll('.enemy,.boss,.bullet,.enemy-bullet,.boss-bullet,.laser,.life-box')
+        .forEach(e=>e.remove());
+      const w=document.createElement('div');
+      w.id='winScreen';
+      w.innerHTML=`<h1>🚀 YOU WIN! 🎉</h1>
+                   <button onclick="location.reload()">🔄 Play Again</button>`;
+      game.appendChild(w);
+    }
+    function endGame(){
+      gameRunning=false;
+      gameOverScreen.style.display='block';
     }
 
-    // Mouse movement
-    game.addEventListener('mousemove', e => {
-      if (!gameRunning) return;
-      const rect = game.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      movePlayer(mouseX, mouseY);
+    // Start & Controls
+    function startGame(){
+      startScreen.style.display='none';
+      hud.style.display='block';
+      playerEl.style.display='block';
+      gameRunning=true;
+      score=0; lives=3; bossesDefeated=0; nextBossIndex=0; lifeTimer=0;
+      bossTimeouts=[];
+      updateHUD();
+      lastTime=performance.now();
+      requestAnimationFrame(gameLoop);
+    }
+    game.addEventListener('mousemove',e=>{
+      const r=game.getBoundingClientRect();
+      mx=e.clientX-r.left; my=e.clientY-r.top;
     });
-
-    // Touch movement
-    game.addEventListener('touchmove', e => {
-      if (!gameRunning || e.touches.length === 0) return;
-      const rect = game.getBoundingClientRect();
-      const touchX = e.touches[0].clientX - rect.left;
-      const touchY = e.touches[0].clientY - rect.top;
-      movePlayer(touchX, touchY);
-    }, { passive: true });
-
-    function movePlayer(x, y) {
-      let newLeft = x - player.offsetWidth / 2;
-      let newTop = y - player.offsetHeight / 2;
-      newLeft = Math.max(0, Math.min(newLeft, game.offsetWidth - player.offsetWidth));
-      newTop = Math.max(0, Math.min(newTop, game.offsetHeight - player.offsetHeight));
-      player.style.left = newLeft + 'px';
-      player.style.top = newTop + 'px';
-    }
-
-    // Touchstart fires shooting if not yet firing
-    game.addEventListener('touchstart', function () {
-      if (gameRunning && !shootInterval) {
-        shootInterval = setInterval(shoot, 300);
-      }
-    }, { passive: true });
+    game.addEventListener('mousedown',()=>firing=true);
+    game.addEventListener('mouseup',()=>firing=false);
+    game.addEventListener('touchmove',e=>{
+      const r=game.getBoundingClientRect();
+      mx=e.touches[0].clientX-r.left;
+      my=e.touches[0].clientY-r.top;
+    },{passive:true});
+    game.addEventListener('touchstart',()=>firing=true,{passive:true});
+    game.addEventListener('touchend',()=>firing=false,{passive:true});
   </script>
 </body>
 </html>
