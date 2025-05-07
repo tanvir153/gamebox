@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <link rel="stylesheet" href="snake.css">
+  
+</head>
+<body>
+  <div class="menu">
+    <button id="startBtn">Start Game</button>
+    <button id="pauseBtn" disabled>Pause</button>
+    <button id="quitBtn" disabled>Quit Game</button>
+  </div>
+  <div class="game-container">
+    <div class="score-board">Score: <span id="score">0</span></div>
+    <div class="level-board">Level: <span id="level">1</span></div>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>  <!-- resized board -->  <!-- resized board -->
+    <div class="game-over" id="gameOver">
+      Game Over!<br>
+      <button onclick="restartGame()">Retry</button>
+    </div>
+  </div>
+  <div class="control-buttons">
+    <button class="control-button btn-up" onclick="changeDir('UP')">⬆️</button>
+    <button class="control-button btn-left" onclick="changeDir('LEFT')">⬅️</button>
+    <button class="control-button btn-down" onclick="changeDir('DOWN')">⬇️</button>
+    <button class="control-button btn-right" onclick="changeDir('RIGHT')">➡️</button>
+  </div>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const box = 12, size = 500, rows = size / box;  // smaller cell and board size  // smaller cell and board size
+    let snake, food, bonusFood, direction, score, speed, level, gameInterval, normalCount;
+    let bonusTimeout, frame;
+    let isPaused = false;
+
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const quitBtn  = document.getElementById('quitBtn');
+
+    startBtn.addEventListener('click', () => {
+      initGame(); startBtn.disabled=true; pauseBtn.disabled=false; quitBtn.disabled=false;
+    });
+    pauseBtn.addEventListener('click', () => { isPaused ? resumeGame() : pauseGame(); });
+    quitBtn.addEventListener('click', () => {
+      endGame(); clearCanvas(); startBtn.disabled=false; pauseBtn.disabled=true; quitBtn.disabled=true;
+    });
+
+    function initGame() {
+      clearTimeout(bonusTimeout);
+      snake=[{x:Math.floor(rows/2)*box,y:Math.floor(rows/2)*box}];
+      food=randomPos(); bonusFood=null;
+      direction='RIGHT'; score=0; level=1; speed=300; normalCount=0; frame=0; isPaused=false;
+      updateDisplay(); document.getElementById('gameOver').style.display='none';
+      clearInterval(gameInterval);
+      gameInterval=setInterval(drawGame,speed);
+    }
+    function pauseGame(){ clearInterval(gameInterval); isPaused=true; pauseBtn.textContent='Resume'; }
+    function resumeGame(){ gameInterval=setInterval(drawGame,speed); isPaused=false; pauseBtn.textContent='Pause'; }
+    function clearCanvas(){ clearInterval(gameInterval); clearTimeout(bonusTimeout); ctx.clearRect(0,0,size,size); document.getElementById('gameOver').style.display='none'; pauseBtn.textContent='Pause'; isPaused=false; }
+    function randomPos(){ return { x:Math.floor(Math.random()*rows)*box, y:Math.floor(Math.random()*rows)*box }; }
+    function updateDisplay(){ document.getElementById('score').textContent=score; document.getElementById('level').textContent=level; }
+    function changeDir(dir){ if((dir==='UP'||dir==='ArrowUp'||dir==='w'||dir==='W')&&direction!=='DOWN')direction='UP'; else if((dir==='DOWN'||dir==='ArrowDown'||dir==='s'||dir==='S')&&direction!=='UP')direction='DOWN'; else if((dir==='LEFT'||dir==='ArrowLeft'||dir==='a'||dir==='A')&&direction!=='RIGHT')direction='LEFT'; else if((dir==='RIGHT'||dir==='ArrowRight'||dir==='d'||dir==='D')&&direction!=='LEFT')direction='RIGHT'; }
+    document.addEventListener('keydown',e=>{if(!isPaused&&gameInterval)changeDir(e.key);});
+    function drawGame(){ frame++; ctx.clearRect(0,0,size,size);
+      snake.forEach((s,i)=>{ctx.beginPath();ctx.arc(s.x+box/2,s.y+box/2,box/2,0,2*Math.PI);ctx.fillStyle=i===0?`hsl(${(frame*5)%360},100%,50%)`:'green';ctx.fill();});
+      const p=(Math.sin(frame*0.2)+1)/2; const r=box/4+(box/4)*p; ctx.beginPath();ctx.arc(food.x+box/2,food.y+box/2,r,0,2*Math.PI);ctx.fillStyle='red';ctx.fill();
+      if(bonusFood){const hue=(frame*7)%360;ctx.lineWidth=2;ctx.strokeStyle=`hsl(${hue},100%,50%)`;ctx.strokeRect(bonusFood.x+2,bonusFood.y+2,box-4,box-4);ctx.beginPath();ctx.arc(bonusFood.x+box/2,bonusFood.y+box/2,box/3,0,2*Math.PI);ctx.fillStyle=`hsl(${hue},100%,50%)`;ctx.fill();}
+      let head={...snake[0]}; if(direction==='UP')head.y-=box;else if(direction==='DOWN')head.y+=box;else if(direction==='LEFT')head.x-=box;else if(direction==='RIGHT')head.x+=box;
+      if(head.x<0||head.x>=size||head.y<0||head.y>=size||snake.some(s=>s.x===head.x&&s.y===head.y))return endGame();
+      snake.unshift(head);
+      if(bonusFood&&head.x===bonusFood.x&&head.y===bonusFood.y){score+=4;bonusFood=null;updateDisplay();clearTimeout(bonusTimeout);} else if(head.x===food.x&&head.y===food.y){score++;normalCount++;updateDisplay();food=randomPos();if(normalCount%6===0){bonusFood=randomPos();clearTimeout(bonusTimeout);bonusTimeout=setTimeout(()=>{bonusFood=null;},7000);} const nl=Math.floor(score/5)+1; if(nl>level){level=nl;updateDisplay();speed=Math.max(150,speed-30);clearInterval(gameInterval);gameInterval=setInterval(drawGame,speed);} } else snake.pop(); }
+    function endGame(){clearInterval(gameInterval);gameInterval=null;clearTimeout(bonusTimeout);document.getElementById('gameOver').style.display='block';}
+    function restartGame(){initGame();}
+  </script>
+</body>
+</html>
