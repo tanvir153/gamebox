@@ -85,7 +85,7 @@
 
     .cta-section p {
       font-size: 1.1em;
-      margin-bottom: 25px;
+      margin-bottom: 15px;
       color: #ddd;
     }
 
@@ -94,6 +94,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 16px;
+      margin-top: 20px;
     }
 
     .game-btn {
@@ -173,13 +174,18 @@
   <main>
     <div class="cta-section">
       <p>Click a game to begin your monster-level fun!</p>
+
+      <!-- 🎵 Autoplay Music (1 Track Only) -->
+      <audio id="bgMusic" src="melody-ring-tone-313022.mp3" autoplay loop preload="auto"></audio>
+
       <div class="game-grid">
         <a href="guess.html" class="game-btn">🎯 Guess the Number</a>
         <a href="space-shooter.html" class="game-btn">🚀 Space Shooter</a>
-        <a href="Snake.html" class="game-btn">🐍Snake Game</a>
+        <a href="Snake.html" class="game-btn">🐍 Snake Game</a>
       </div>
     </div>
   </main>
+
   <footer>
     <p>Developed by <strong>MD Tanvir Sardar</strong></p>
     <p>
@@ -190,12 +196,12 @@
       <a href="https://www.facebook.com/mdtanvirsardar" target="_blank">Facebook</a>
     </p>
     <p style="margin-top: 8px; font-style: italic; color: #999;">
-      No copyright —
-      built for fun and learning
+      No copyright — built for fun and learning
     </p>
   </footer>
 
   <script>
+    // Typing animation for heading
     const text = "Tanvir's Game Hub";
     const target = document.getElementById("typed-heading");
     let index = 0;
@@ -221,7 +227,18 @@
       }
     }
 
-    window.onload = typeEffect;
+    window.onload = () => {
+      typeEffect();
+
+      // Try auto-playing music on user interaction fallback
+      const music = document.getElementById("bgMusic");
+      document.body.addEventListener('click', () => {
+        if (music.paused) {
+          music.volume = 0.5;
+          music.play().catch(e => console.log("Autoplay blocked."));
+        }
+      }, { once: true });
+    };
   </script>
 
 </body>
