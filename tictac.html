@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic Tac Toe</title>
+  <style>
+    :root {
+      --bg: linear-gradient(-45deg, #f0f0f0, #dbe4ff, #fce4ec, #fff3cd);
+      --cell-bg: white;
+      --text: #000;
+      --disabled: #e0e0e0;
+      --win: #4CAF50;
+    }
+    body.dark {
+      --bg: linear-gradient(-45deg, #1e1e1e, #2a2a40, #3a3a3a, #121212);
+      --cell-bg: #1e1e1e;
+      --text: #fff;
+      --disabled: #444;
+      --win: #2196F3;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      background-size: 400% 400%;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      justify-content: center;
+      transition: background 0.5s ease, color 0.5s ease;
+      animation: bgAnimate 20s ease infinite;
+    }
+    @keyframes bgAnimate {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    h1 {
+      margin-bottom: 10px;
+      font-size: 2rem;
+      animation: fadeInDown 1s ease;
+    }
+    #toggleDark, #toggleMusic {
+      margin: 10px 5px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #000;
+      color: #fff;
+      cursor: pointer;
+    }
+    #toggleDark:hover, #toggleMusic:hover {
+      background: #333;
+    }
+    #modeSelect, #gameContainer {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cell-bg);
+      border-radius: 10px;
+      border: 2px solid #333;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .cell:hover {
+      background: #b3e5fc;
+      transform: scale(1.05);
+    }
+    .cell.disabled {
+      pointer-events: none;
+      background: var(--disabled);
+    }
+    .win {
+      background: var(--win) !important;
+      color: white;
+      font-weight: bold;
+      animation: pulseWin 0.5s infinite alternate;
+    }
+    @keyframes pulseWin {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+    #message {
+      margin-top: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    #score {
+      margin: 10px 0;
+      font-weight: bold;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    button {
+      margin: 8px 5px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background: #1976d2;
+      color: white;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #0d47a1;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tic-Tac-Toe</h1>
+  <div>
+    <button id="toggleDark">Toggle Dark Mode</button>
+    <button id="toggleMusic">🔊 Music</button>
+  </div>
+
+  <div id="modeSelect">
+    <p>Choose Mode:</p>
+    <button onclick="selectMode('single')">Single Player (vs AI)</button>
+    <button onclick="selectMode('two')">Two Player</button>
+  </div>
+
+  <div id="gameContainer">
+    <div id="score">X: 0 | O: 0 | Draws: 0</div>
+    <div id="board"></div>
+    <div id="message"></div>
+    <div>
+      <button onclick="startGame()">Restart</button>
+      <button onclick="backToStart()">Back to Start</button>
+    </div>
+  </div>
+
+  <!-- 🎵 Background Music -->
+  <audio id="bgMusic" src="guitar-intro-ident-335301.mp3" preload="auto" loop></audio>
+
+  <script>
+    const modeSelectEl = document.getElementById('modeSelect');
+    const gameContainer = document.getElementById('gameContainer');
+    const boardEl = document.getElementById('board');
+    const messageEl = document.getElementById('message');
+    const scoreEl = document.getElementById('score');
+    const toggleDarkBtn = document.getElementById('toggleDark');
+    const toggleMusicBtn = document.getElementById('toggleMusic');
+    const bgMusic = document.getElementById('bgMusic');
+
+    let board = [];
+    const human = 'X';
+    const ai = 'O';
+    let mode = null;
+    let currentPlayer = 'X';
+    let score = { X: 0, O: 0, draw: 0 };
+    let musicPlaying = false;
+    let firstClickHandled = false;
+
+    toggleDarkBtn.onclick = () => {
+      document.body.classList.toggle('dark');
+    };
+
+    toggleMusicBtn.onclick = () => {
+      if (!musicPlaying) {
+        bgMusic.volume = 0.5;
+        bgMusic.play();
+        musicPlaying = true;
+        toggleMusicBtn.textContent = "🔇 Mute";
+      } else {
+        bgMusic.pause();
+        musicPlaying = false;
+        toggleMusicBtn.textContent = "🔊 Music";
+      }
+    };
+
+    document.addEventListener("click", () => {
+      if (!firstClickHandled) {
+        bgMusic.volume = 0.5;
+        bgMusic.play().then(() => {
+          musicPlaying = true;
+          toggleMusicBtn.textContent = "🔇 Mute";
+        }).catch(err => {
+          console.log("Autoplay failed, try interacting with the button.");
+        });
+        firstClickHandled = true;
+      }
+    });
+
+    function selectMode(selectedMode) {
+      mode = selectedMode;
+      modeSelectEl.style.display = 'none';
+      gameContainer.style.display = 'flex';
+      startGame();
+    }
+
+    function startGame() {
+      board = Array(9).fill('');
+      currentPlayer = 'X';
+      messageEl.textContent = '';
+      render();
+    }
+
+    function render() {
+      boardEl.innerHTML = '';
+      board.forEach((cell, i) => {
+        const div = document.createElement('div');
+        div.className = 'cell';
+        div.textContent = cell;
+        if (cell || isGameOver(board)) {
+          div.classList.add('disabled');
+        } else {
+          div.onclick = () => {
+            if (mode === 'single') {
+              if (!board[i]) {
+                board[i] = human;
+                if (!isGameOver(board)) {
+                  const bestMove = getBestMove(board);
+                  board[bestMove] = ai;
+                }
+                render();
+              }
+            } else if (mode === 'two') {
+              if (!board[i]) {
+                board[i] = currentPlayer;
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                render();
+              }
+            }
+          };
+        }
+        boardEl.appendChild(div);
+      });
+
+      const result = checkWinner(board);
+      if (result) {
+        if (result.winner === 'draw') {
+          messageEl.textContent = "It's a draw!";
+          score.draw++;
+        } else {
+          messageEl.textContent = `${result.winner} wins!`;
+          score[result.winner]++;
+          result.combo.forEach(index => {
+            boardEl.children[index].classList.add('win');
+          });
+        }
+        updateScoreDisplay();
+      }
+    }
+
+    function updateScoreDisplay() {
+      scoreEl.textContent = `X: ${score.X} | O: ${score.O} | Draws: ${score.draw}`;
+    }
+
+    function getBestMove(newBoard) {
+      let bestScore = -Infinity;
+      let move;
+      newBoard.forEach((cell, i) => {
+        if (!cell) {
+          newBoard[i] = ai;
+          let score = minimax(newBoard, 0, false);
+          newBoard[i] = '';
+          if (score > bestScore) {
+            bestScore = score;
+            move = i;
+          }
+        }
+      });
+      return move;
+    }
+
+    function minimax(newBoard, depth, isMaximizing) {
+      const result = checkWinner(newBoard);
+      if (result) {
+        if (result.winner === ai) return 10 - depth;
+        if (result.winner === human) return depth - 10;
+        if (result.winner === 'draw') return 0;
+      }
+
+      if (isMaximizing) {
+        let best = -Infinity;
+        newBoard.forEach((cell, i) => {
+          if (!cell) {
+            newBoard[i] = ai;
+            let score = minimax(newBoard, depth + 1, false);
+            newBoard[i] = '';
+            best = Math.max(score, best);
+          }
+        });
+        return best;
+      } else {
+        let best = Infinity;
+        newBoard.forEach((cell, i) => {
+          if (!cell) {
+            newBoard[i] = human;
+            let score = minimax(newBoard, depth + 1, true);
+            newBoard[i] = '';
+            best = Math.min(score, best);
+          }
+        });
+        return best;
+      }
+    }
+
+    function checkWinner(b) {
+      const winCombos = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (let combo of winCombos) {
+        const [a, b1, c] = combo;
+        if (b[a] && b[a] === b[b1] && b[a] === b[c]) {
+          return { winner: b[a], combo };
+        }
+      }
+      if (b.every(cell => cell)) return { winner: 'draw' };
+      return null;
+    }
+
+    function isGameOver(b) {
+      return !!checkWinner(b);
+    }
+
+    function backToStart() {
+      gameContainer.style.display = 'none';
+      modeSelectEl.style.display = 'flex';
+      score = { X: 0, O: 0, draw: 0 };
+      updateScoreDisplay();
+    }
+
+    modeSelectEl.style.display = 'flex';
+  </script>
+</body>
+</html>

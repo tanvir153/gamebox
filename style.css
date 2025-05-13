@@ -1,0 +1,194 @@
+/* ===== Base Reset ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #667eea, #764ba2);
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  /* ===== Glowing Background Animation ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    width: 150%;
+    height: 150%;
+    top: -25%;
+    left: -25%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    animation: pulse 20s infinite linear;
+    z-index: -1;
+  }
+  
+  @keyframes pulse {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* ===== Header ===== */
+  h1 {
+    text-align: center;
+    font-size: 3rem;
+    margin: 30px 0;
+    color: #ffffff;
+    text-shadow: 2px 2px #00000040;
+  }
+  
+  /* ===== Tabs ===== */
+  .tabs {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .tabs button {
+    padding: 12px 24px;
+    margin: 0 10px;
+    background-color: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  .tabs button:hover {
+    background: #ffffff;
+    color: #764ba2;
+    transform: scale(1.05);
+  }
+  
+  /* ===== Container ===== */
+  .container,
+  #resume-form,
+  #cover-tab form,
+  #cover-preview,
+  #resume-preview {
+    width: 95%;
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 30px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+  }
+  
+  /* ===== Form Elements ===== */
+  form input,
+  form textarea,
+  form select {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1rem;
+    display: block;
+  }
+  
+  form input::placeholder,
+  form textarea::placeholder {
+    color: #f0f0f0;
+  }
+  
+  form input:focus,
+  form textarea:focus,
+  form select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.02);
+    box-shadow: 0 0 8px #ffd700;
+  }
+  
+  /* ===== Buttons ===== */
+  button {
+    background: #ff6b6b;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px 5px;
+    display: inline-block;
+  }
+  
+  button:hover {
+    background: #ffd700;
+    color: #333;
+    transform: scale(1.05);
+    box-shadow: 0 0 12px #ffd70080;
+  }
+  
+  /* ===== Preview Image (Profile Pic) ===== */
+  #preview-pic,
+  #preview-img-output {
+    max-width: 120px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    display: block;
+  }
+  
+  /* ===== Template Styling ===== */
+  #resume-preview.style1 {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+  
+  #resume-preview.style2 {
+    background: #ffffff12;
+    color: #fff;
+    border-left: 6px solid #00e0ff;
+    padding-left: 20px;
+  }
+  
+  /* ===== Resume Content ===== */
+  #resume-preview h2,
+  #cover-preview h2 {
+    color: #ffd700;
+    font-size: 1.8rem;
+    margin-top: 10px;
+  }
+  #resume-preview h3 {
+    color: #f78fb3;
+    margin-top: 20px;
+  }
+  #resume-preview p,
+  #cover-preview p {
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  ul {
+    padding-left: 20px;
+  }
+  ul li {
+    margin-bottom: 8px;
+  }
+  
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2rem;
+    }
+    .tabs button {
+      padding: 10px 16px;
+      margin: 5px;
+    }
+    .container,
+    #resume-form,
+    #resume-preview,
+    #cover-tab form,
+    #cover-preview {
+      padding: 20px;
+      width: 95%;
+    }
+  }
+  
